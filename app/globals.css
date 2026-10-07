@@ -1,26 +1,206 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg: #0a0a0a;
+  --surface: #141414;
+  --border: rgb(255 255 255 / 0.1);
+  --foreground: #ffffff;
+  --muted: #8a8a8a;
+  --accent: #2f6fb2;
+  --accent-foreground: #ffffff;
+  --accent-text: #5b9be0;
+  --glow: #3b8cff;
 }
 
 @theme inline {
-  --color-background: var(--background);
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-border: var(--border);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent-text: var(--accent-text);
+  --font-sans: var(--font-geist-sans), system-ui, sans-serif;
+  --color-glow: var(--glow);
 }
+@theme {
+  --animate-marquee: marquee 40s linear infinite;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  @keyframes marquee {
+    to {
+      transform: translateX(-50%);
+    }
   }
 }
 
+@property --cursor-r {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+
 body {
-  background: var(--background);
+  background: var(--bg);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+}
+
+body.custom-cursor-active,
+body.custom-cursor-active * {
+  cursor: none !important;
+}
+
+body.custom-cursor-active :is(input, textarea, select) {
+  cursor: auto !important;
+}
+
+.custom-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 2147483647;
+  pointer-events: none;
+  opacity: 0;
+  will-change: transform;
+  transition: opacity 150ms ease;
+}
+
+.custom-cursor[data-visible="true"] {
+  opacity: 1;
+}
+
+.custom-cursor > span {
+  display: block;
+  width: 12px;
+  height: 12px;
+  border-radius: 9999px;
+  background: white;
+  transform: translate(-50%, -50%);
+  transform-origin: center;
+  transition: background-color 200ms ease, box-shadow 200ms ease;
+  will-change: transform;
+}
+
+.custom-cursor[data-kind="text"] > span {
+  background: transparent;
+  box-shadow: inset 0 0 0 1px var(--accent-text);
+}
+
+[data-cursor-active] {
+  background-image:
+    radial-gradient(
+      circle var(--cursor-r, 0px) at var(--cursor-x) var(--cursor-y),
+      var(--accent-text) 98%,
+      transparent 100%
+    ),
+    linear-gradient(var(--cursor-base), var(--cursor-base));
+  background-clip: text;
+  color: transparent;
+  transition: --cursor-r 200ms ease;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+[data-cursor-active] svg {
+  color: var(--cursor-base);
+  -webkit-text-fill-color: initial;
+}
+
+:is(a, button)[data-cursor-active] {
+  background-image:
+    radial-gradient(
+      circle var(--cursor-r, 0px) at var(--cursor-x) var(--cursor-y),
+      var(--accent-text) 98%,
+      transparent 100%
+    ),
+    linear-gradient(var(--cursor-base), var(--cursor-base)),
+    linear-gradient(var(--cursor-background), var(--cursor-background));
+  background-clip: text, text, border-box;
+  -webkit-background-clip: text, text, border-box;
+}
+
+[data-cursor-card] [data-cursor="text"] {
+  display: inline-block;
+}
+
+[data-cursor-line] {
+  margin: -0.08em -0.05em;
+  padding: 0.08em 0.05em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .custom-cursor,
+  .custom-cursor > span,
+  [data-cursor-active] {
+    transition: none;
+  }
+}
+
+
+@keyframes icon-draw {
+  0% { stroke-dashoffset: 1; }
+  30%, 65% { stroke-dashoffset: 0; }
+  95%, 100% { stroke-dashoffset: -1; }
+}
+@keyframes icon-ring {
+  0% { transform: scale(0.6); opacity: 0.9; }
+  70%, 100% { transform: scale(3); opacity: 0; }
+}
+@keyframes icon-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.5); }
+}
+@keyframes icon-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-1.5px); }
+}
+@keyframes icon-buzz {
+  0%, 55%, 100% { transform: rotate(0); }
+  60% { transform: rotate(-9deg); }
+  66% { transform: rotate(9deg); }
+  72% { transform: rotate(-7deg); }
+  78% { transform: rotate(7deg); }
+  84% { transform: rotate(-3deg); }
+  90% { transform: rotate(0); }
+}
+@keyframes icon-blink {
+  0%, 84%, 100% { transform: scaleY(1); }
+  90% { transform: scaleY(0.1); }
+}
+@keyframes icon-wiggle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-1.6px); }
+}
+
+.icon-draw {
+  stroke-dasharray: 1;
+  animation: icon-draw 3s ease-in-out infinite;
+}
+.icon-draw-delay { animation-delay: 0.35s; }
+
+.icon-ring,
+.icon-pulse,
+.icon-float,
+.icon-buzz,
+.icon-blink,
+.icon-wiggle {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.icon-ring { animation: icon-ring 2s ease-out infinite; }
+.icon-pulse { animation: icon-pulse 1.6s ease-in-out infinite; }
+.icon-float { animation: icon-float 2.4s ease-in-out infinite; }
+.icon-buzz { animation: icon-buzz 3.6s ease-in-out infinite; }
+.icon-blink { animation: icon-blink 3s ease-in-out infinite; }
+.icon-wiggle { animation: icon-wiggle 1.2s ease-in-out infinite; }
+.icon-wiggle-alt { animation-delay: 0.6s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .icon-draw, .icon-ring, .icon-pulse, .icon-float,
+  .icon-buzz, .icon-blink, .icon-wiggle { animation: none; }
+  .icon-draw { stroke-dasharray: none; }
+  .icon-ring { opacity: 0; }
 }
