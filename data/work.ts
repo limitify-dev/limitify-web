@@ -53,7 +53,7 @@ export const work: WorkProject[] = [
     image: atlasProjectImage,
     featured: false,
     links: {
-      website: null,
+      website: "https://atlas.limitify.rw",
       android: null,
       ios: null,
     },

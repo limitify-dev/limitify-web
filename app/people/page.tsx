@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { team } from "@/data/team";
+import { getPortfolio } from "@/data/portfolio";
 
 export const metadata: Metadata = {
   title: "People · Limitify",
@@ -64,7 +65,11 @@ export default function PeoplePage() {
           {team.map((person) => (
             <Link
               key={person.name}
-              href="/contact"
+              href={
+                getPortfolio(person.slug)
+                  ? `/people/${person.slug}`
+                  : "/contact"
+              }
               className="group block"
             >
               <div className="relative aspect-4/5 overflow-hidden rounded-[1.5rem]">
